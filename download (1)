@@ -1,0 +1,54 @@
+# setup_builder.py - 生成PDA安装程序
+import os
+import sys
+
+def create_installer():
+    """创建PDA安装脚本"""
+    
+    setup_script = '''
+@echo off
+title PDA 拼音编程语言安装程序
+echo ========================================
+echo    PDA 拼音编程语言安装程序 v1.0
+echo ========================================
+echo.
+
+set INSTALL_DIR=%ProgramFiles%\\PDA
+
+echo 选择安装目录：
+echo 1. 默认 (%INSTALL_DIR%)
+echo 2. 自定义
+set /p choice="请输入选项 (1/2): "
+
+if "%choice%"=="2" (
+    set /p INSTALL_DIR="请输入安装路径: "
+)
+
+echo.
+echo 正在安装到 %INSTALL_DIR%...
+if not exist "%INSTALL_DIR%" mkdir "%INSTALL_DIR%"
+
+copy pda_runner.py "%INSTALL_DIR%\\" >nul
+copy "*.pda" "%INSTALL_DIR%\\" >nul
+
+echo 创建桌面快捷方式...
+echo [InternetShortcut] > "%USERPROFILE%\\Desktop\\PDA交互模式.url"
+echo URL=file:///%INSTALL_DIR%\\pda_runner.py >> "%USERPROFILE%\\Desktop\\PDA交互模式.url"
+
+echo 关联 .pda 文件...
+assoc .pda=PDAFile
+ftype PDAFile=python "%INSTALL_DIR%\\pda_runner.py" "%%1"
+
+echo.
+echo 安装完成！
+echo 现在可以双击 .pda 文件直接运行了！
+pause
+'''
+    
+    with open('setup.bat', 'w', encoding='gbk') as f:
+        f.write(setup_script)
+    
+    print("✅ 安装脚本已生成：setup.bat")
+
+if __name__ == "__main__":
+    create_installer()
